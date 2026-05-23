@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: epci_ims_db
+    restart: always
+    environment:
+      POSTGRES_USER: epci_user
+      POSTGRES_PASSWORD: epci_password
+      POSTGRES_DB: epci_ims
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
