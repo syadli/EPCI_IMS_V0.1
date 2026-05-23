@@ -1,21 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Query, UseGuards, Request, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
-import { randomUUID } from 'crypto';
 import type { Express } from 'express';
 import { InterfaceRequestsService } from './interface-requests.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { IRStatus, IRPriority } from '@prisma/client';
-
-const attachmentStorage = diskStorage({
-  destination: join(__dirname, '..', '..', 'uploads', 'attachments'),
-  filename: (_req, file, callback) => {
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-_]/g, '_');
-    const fileName = `${Date.now()}-${randomUUID()}-${safeName}`;
-    callback(null, fileName);
-  },
-});
 
 @Controller('interface-requests')
 @UseGuards(AuthGuard)
@@ -68,7 +56,7 @@ export class InterfaceRequestsController {
   }
 
   @Post(':id/attachments')
-  @UseInterceptors(FileInterceptor('file', { storage: attachmentStorage }))
+  @UseInterceptors(FileInterceptor('file'))
   async uploadAttachment(
     @Request() req: any,
     @Param('id') id: string,

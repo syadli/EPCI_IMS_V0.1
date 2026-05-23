@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { InterfaceRequest, IRStatus, IRPriority, Prisma } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
+import { GcsService } from '../gcs/gcs.service';
 
 @Injectable()
 export class InterfaceRequestsService {
@@ -11,6 +12,7 @@ export class InterfaceRequestsService {
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
     private realtimeGateway: RealtimeGateway,
+    private gcsService: GcsService,
   ) {}
 
   async findAll(filters: {
@@ -64,6 +66,15 @@ export class InterfaceRequestsService {
     });
 
     if (!ir) throw new NotFoundException(`IR with ID ${id} not found`);
+
+    if (ir.attachments) {
+      ir.attachments = await this.signAttachmentUrls(ir.attachments);
+    }
+
+    if (ir.response && ir.response.attachments) {
+      ir.response.attachments = await this.signAttachmentUrls(ir.response.attachments);
+    }
+
     return ir;
   }
 
@@ -172,27 +183,47 @@ export class InterfaceRequestsService {
     const ir = await this.prisma.interfaceRequest.findUnique({ where: { id: requestId } });
     if (!ir) throw new NotFoundException(`IR with ID ${requestId} not found`);
 
+    // 1. Upload ke GCS dan dapatkan path unik relatifnya
+    const { gcsPath } = await this.gcsService.uploadFile(file);
+
+    // 2. Simpan path tersebut ke database (kolom url)
     const attachment = await this.prisma.attachment.create({
       data: {
         filename: file.originalname,
         size: file.size,
-        url: `/uploads/attachments/${file.filename}`,
+        url: gcsPath,
         uploadedBy,
         requestId,
       },
     });
 
-    return attachment;
+    // 3. Kembalikan detail attachment dengan Signed URL
+    return {
+      ...attachment,
+      url: await this.gcsService.getSignedUrl(attachment.url),
+    };
   }
 
   async findRequestAttachments(requestId: string) {
     const ir = await this.prisma.interfaceRequest.findUnique({ where: { id: requestId } });
     if (!ir) throw new NotFoundException(`IR with ID ${requestId} not found`);
 
-    return this.prisma.attachment.findMany({
+    const attachments = await this.prisma.attachment.findMany({
       where: { requestId },
       orderBy: { uploadedAt: 'desc' },
     });
+
+    return this.signAttachmentUrls(attachments);
+  }
+
+  private async signAttachmentUrls(attachments: any[]): Promise<any[]> {
+    if (!attachments) return [];
+    return Promise.all(
+      attachments.map(async (att) => ({
+        ...att,
+        url: await this.gcsService.getSignedUrl(att.url),
+      })),
+    );
   }
 
   private humanizeStatus(status: IRStatus): string {
