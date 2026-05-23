@@ -1,0 +1,75 @@
+# ====================================================================
+# EPCI Interface Management System (IMS) - Master Git Ignore
+# ====================================================================
+
+# --------------------------------------------------------------------
+# System & Environment Files (Global)
+# --------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.log
+*.local
+
+# --------------------------------------------------------------------
+# Node.js & Dependency Managers (Shared)
+# --------------------------------------------------------------------
+node_modules/
+/node_modules
+.npm
+.eslintcache
+.turbo
+dist/
+build/
+
+# --------------------------------------------------------------------
+# Security & Secret Credentials (NEVER COMMIT TO GIT)
+# --------------------------------------------------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.cert
+
+# --------------------------------------------------------------------
+# Backend Specific (NestJS & Prisma & Docker)
+# --------------------------------------------------------------------
+# NestJS build output
+backend/dist/
+backend/node_modules/
+
+# Prisma generated files & SQLite test DBs (if any)
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Local storage for file uploads (Attachment Dokumen IR)
+# Kita mengabaikan isinya, tapi tetap menyisakan foldernya jika kosong
+backend/uploads/attachments/*
+!backend/uploads/attachments/.gitkeep
+
+# Docker volumes / local data paths
+.docker-data/
+
+# --------------------------------------------------------------------
+# Frontend Specific (Next.js)
+# --------------------------------------------------------------------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Next.js coverage report
+frontend/coverage/
+
+# --------------------------------------------------------------------
+# Google Antigravity & AI Agents Workspaces
+# --------------------------------------------------------------------
+# Mengabaikan cache internal Agen AI agar tidak mengotori commit history
+.agents/cache/
+.agents/logs/
