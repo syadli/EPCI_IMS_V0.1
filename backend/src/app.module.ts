@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import gcsConfig from './config/gcs.config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailModule } from './mail/mail.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -19,6 +22,9 @@ import { RealtimeModule } from './realtime/realtime.module';
       isGlobal: true,
       load: [gcsConfig],
     }),
+    ScheduleModule.forRoot(),
+    MailModule,
+    ScheduleModule,
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -32,4 +38,4 @@ import { RealtimeModule } from './realtime/realtime.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
