@@ -23,6 +23,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.2.1",
     "@google-cloud/storage": "^7.19.0",
     "@nestjs-modules/mailer": "^2.3.6",
     "@nestjs/common": "^11.0.1",
@@ -50,7 +51,6 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
-    "@prisma/client": "^6.2.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.1.0",

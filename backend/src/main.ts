@@ -25,12 +25,17 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3001);
-  console.log(`Backend is running on: http://localhost:3001/api`);
-  console.log(`API Documentation available at: http://localhost:3001/docs`);
+  // --- BAGIAN YANG DIPERBARUI UNTUK CLOUD RUN ---
+  const port = process.env.PORT || 3001;
+
+  // Wajib menambahkan '0.0.0.0' agar network internal GCP bisa mengakses container
+  await app.listen(port, '0.0.0.0');
+
+  console.log(`Backend is running on port: ${port} (API Prefix: /api)`);
+  console.log(`API Documentation available at: http://localhost:${port}/docs`);
 }
 bootstrap();
